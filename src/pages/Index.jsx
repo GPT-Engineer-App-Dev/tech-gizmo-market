@@ -1,4 +1,5 @@
-import { Box, Container, Flex, Heading, Image, Text, VStack } from "@chakra-ui/react";
+import { Box, Container, Flex, Heading, Image, Text, VStack, Input } from "@chakra-ui/react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 
 const products = [
@@ -26,6 +27,16 @@ const products = [
 ];
 
 const Index = () => {
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const handleSearchChange = (event) => {
+    setSearchTerm(event.target.value);
+  };
+
+  const filteredProducts = products.filter((product) =>
+    product.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <Container maxW="container.xl" p={4}>
       <Flex as="nav" bg="blue.500" color="white" p={4} justifyContent="space-between" alignItems="center">
@@ -38,8 +49,17 @@ const Index = () => {
         </Box>
       </Flex>
 
+      <Box mt={4} mb={8}>
+        <Input
+          placeholder="Search for products..."
+          value={searchTerm}
+          onChange={handleSearchChange}
+          size="lg"
+        />
+      </Box>
+
       <VStack spacing={8} mt={8}>
-        {products.map((product) => (
+        {filteredProducts.map((product) => (
           <Box key={product.id} borderWidth="1px" borderRadius="lg" overflow="hidden" width="100%" maxW="lg">
             <Image src={product.image} alt={product.name} />
 
