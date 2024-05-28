@@ -1,4 +1,4 @@
-import { Box, Container, Flex, Heading, Image, Text, VStack, Input } from "@chakra-ui/react";
+import { Box, Container, Flex, Heading, Image, Text, VStack, Input, Select, Checkbox, CheckboxGroup, Stack, Button } from "@chakra-ui/react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 
@@ -9,6 +9,9 @@ const products = [
     description: "A modern smartphone with all the latest features.",
     price: "$699",
     image: "/images/smartphone.jpg",
+    category: "smartphone",
+    priceRange: "500-999",
+    brand: "brandA",
   },
   {
     id: 2,
@@ -16,6 +19,9 @@ const products = [
     description: "A sleek, powerful laptop for all your computing needs.",
     price: "$999",
     image: "/images/laptop.jpg",
+    category: "laptop",
+    priceRange: "500-999",
+    brand: "brandB",
   },
   {
     id: 3,
@@ -23,19 +29,52 @@ const products = [
     description: "A high-end digital camera for capturing stunning photos.",
     price: "$499",
     image: "/images/camera.jpg",
+    category: "camera",
+    priceRange: "0-499",
+    brand: "brandC",
   },
 ];
 
 const Index = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedPriceRange, setSelectedPriceRange] = useState("");
+  const [selectedBrands, setSelectedBrands] = useState([]);
 
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);
   };
 
-  const filteredProducts = products.filter((product) =>
-    product.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const handleCategoryChange = (event) => {
+    setSelectedCategory(event.target.value);
+  };
+
+  const handlePriceRangeChange = (event) => {
+    setSelectedPriceRange(event.target.value);
+  };
+
+  const handleBrandChange = (event) => {
+    const value = event.target.value;
+    setSelectedBrands((prev) =>
+      prev.includes(value) ? prev.filter((brand) => brand !== value) : [...prev, value]
+    );
+  };
+
+  const handleClearFilters = () => {
+    setSelectedCategory("");
+    setSelectedPriceRange("");
+    setSelectedBrands([]);
+    setSearchTerm("");
+  };
+
+  const filteredProducts = products.filter((product) => {
+    const matchesSearchTerm = product.name.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = selectedCategory ? product.category === selectedCategory : true;
+    const matchesPriceRange = selectedPriceRange ? product.priceRange === selectedPriceRange : true;
+    const matchesBrand = selectedBrands.length > 0 ? selectedBrands.includes(product.brand) : true;
+
+    return matchesSearchTerm && matchesCategory && matchesPriceRange && matchesBrand;
+  });
 
   return (
     <Container maxW="container.xl" p={4}>
@@ -50,6 +89,33 @@ const Index = () => {
       </Flex>
 
       <Box mt={4} mb={8}>
+        <Input
+          placeholder="Search for products..."
+          value={searchTerm}
+          onChange={handleSearchChange}
+          size="lg"
+          mb={4}
+        />
+        <Flex wrap="wrap" gap={4}>
+          <Select placeholder="Select category" value={selectedCategory} onChange={handleCategoryChange} width="200px">
+            <option value="smartphone">Smartphone</option>
+            <option value="laptop">Laptop</option>
+            <option value="camera">Camera</option>
+          </Select>
+          <Select placeholder="Select price range" value={selectedPriceRange} onChange={handlePriceRangeChange} width="200px">
+            <option value="0-499">$0 - $499</option>
+            <option value="500-999">$500 - $999</option>
+            <option value="1000-1499">$1000 - $1499</option>
+          </Select>
+          <CheckboxGroup value={selectedBrands} onChange={handleBrandChange}>
+            <Stack direction="row">
+              <Checkbox value="brandA">Brand A</Checkbox>
+              <Checkbox value="brandB">Brand B</Checkbox>
+              <Checkbox value="brandC">Brand C</Checkbox>
+            </Stack>
+          </CheckboxGroup>
+          <Button onClick={handleClearFilters}>Clear Filters</Button>
+        </Flex>
         <Input
           placeholder="Search for products..."
           value={searchTerm}
